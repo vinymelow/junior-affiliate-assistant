@@ -1,17 +1,17 @@
-# OFERTA PRINCIPAL DA BATEUBET (PÓS-LIGAÇÃO)
+# OFERTA PRINCIPAL DA BATEUBET (FUNIL CONVITE OURO)
 casa_de_aposta: "BateuBet.br"
-descricao_curta: "30 Giros Grátis no Gates of Olympus depositando qualquer valor + concorra a R$5.000 todo dia."
+descricao_curta: "um bônus exclusivo de 500% no seu primeiro depósito através do Convite Ouro."
 deposito_minimo: "Qualquer Valor (a partir de R$1)"
-link_afiliado: "https://SEU-LINK-AFILIADO.com/bateubet"
+link_afiliado: "https://go.aff.bateu.bet.br/ipyehjvg?utm_source=pt001"
 interesses_chave:
-  - promocao
-  - giros
-  - gates of olympus
   - bonus
-  - 5 mil
-  - premios
+  - 500%
+  - convite ouro
+  - promocao
+  - depositar
 palavras_chave_secundarias:
   - link
   - cadastrar
-  - depositar
+  - ativar
   - oferta
+  - como funciona
