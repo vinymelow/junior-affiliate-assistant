@@ -1,0 +1,17 @@
+# OFERTA PRINCIPAL DA BATEUBET (PÓS-LIGAÇÃO)
+casa_de_aposta: "BateuBet.br"
+descricao_curta: "30 Giros Grátis no Gates of Olympus depositando qualquer valor + concorra a R$5.000 todo dia."
+deposito_minimo: "Qualquer Valor (a partir de R$1)"
+link_afiliado: "https://SEU-LINK-AFILIADO.com/bateubet"
+interesses_chave:
+  - promocao
+  - giros
+  - gates of olympus
+  - bonus
+  - 5 mil
+  - premios
+palavras_chave_secundarias:
+  - link
+  - cadastrar
+  - depositar
+  - oferta

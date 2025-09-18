@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+python-dotenv
+httpx
+openai
+textblob
+spacy
+pydantic
+pydantic-settings
+pandas
+PyYAML
