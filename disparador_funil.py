@@ -26,8 +26,9 @@ async def start_campaign():
 
     print(f"--- Iniciando campanha PÓS-LIGAÇÃO para {len(leads_df)} leads ---")
 
+    # --- CORREÇÃO APLICADA AQUI ---
     # Link único para esta campanha
-    link_da_casa = "https://SEU-LINK-AFILIADO.com/bateubet" # Coloque o link real aqui
+    link_da_casa = "https://go.aff.bateu.bet.br/ipyehjvg?utm_source=pt001" 
 
     for index, row in leads_df.iterrows():
         lead_id = str(row['lead_id'])
