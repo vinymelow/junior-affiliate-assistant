@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from app.api.endpoints import router as api_router
+from app.api import funnel_endpoints
 
 app = FastAPI(
     title="Júnior, o Parceiro | Gestor de Jornada de Leads",
@@ -8,6 +9,7 @@ app = FastAPI(
 )
 
 app.include_router(api_router, prefix="/api")
+app.include_router(funnel_endpoints.router, prefix="/api")
 
 @app.get("/")
 def read_root():

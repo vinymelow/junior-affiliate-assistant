@@ -1,0 +1,12 @@
+{
+  "event": "messages.upsert",
+  "data": {
+    "messageType": "conversation",
+    "key": {
+      "remoteJid": "5511999999999@s.whatsapp.net"
+    },
+    "message": {
+      "conversation": "teste"
+    }
+  }
+}

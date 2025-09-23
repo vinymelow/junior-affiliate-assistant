@@ -1,1 +1,2 @@
 lead_id,nome,telefone,status,last_update,details,summary
+5511987654321,Lead,5511987654321,Funil_Dia2,2025-09-23 20:20:38,"{""dia_funil"": 2, ""data_ultimo_disparo"": ""2025-09-23T20:20:38.538013"", ""tipo_mensagem"": ""whatsapp_followup""}","O cliente está interessado em entender como funciona o bônus, que é de 500% no primeiro depósito a partir de R$1. A decisão final ainda não foi tomada, mas a conversa está em andamento."
