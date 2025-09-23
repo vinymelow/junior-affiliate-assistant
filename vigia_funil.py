@@ -6,7 +6,6 @@ from app.services.affiliate import track_lead_status, parse_tracker_details
 
 TRACKER_FILE_PATH = 'data/conversation_tracker.csv'
 
-# --- MAPEAMENTO ATUALIZADO DO FUNIL WHATSAPP ---
 FUNNEL_LOGIC = {
     'Funil_Dia1_ContatoInicial': {
         'dias_para_agir': 4,
@@ -36,10 +35,6 @@ FUNNEL_LOGIC = {
 }
 
 async def run_funnel_watcher():
-    """
-    Executa a lógica de acompanhamento do funil de 20 dias, enviando as novas
-    mensagens de WhatsApp nos dias corretos.
-    """
     try:
         tracker_df = pd.read_csv(TRACKER_FILE_PATH, dtype={'telefone': str})
     except FileNotFoundError:

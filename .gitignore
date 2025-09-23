@@ -4,6 +4,8 @@ __pycache__/
 venv/
 .vscode/
 vector_store/
-# Ficheiros de dados e backups (Não devem ir para o Git)
-data/leads_master.csv
+
+# Ficheiros de dados, backups e base de dados (Não devem ir para o Git)
+data/*.csv
 *.tar.gz
+*.db

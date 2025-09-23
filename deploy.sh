@@ -12,7 +12,7 @@ echo "🚀 Iniciando deploy 'Hard Reset' para o Júnior Affiliate Assistant..."
 echo "📤 A enviar a versão mais recente do código para o servidor..."
 rsync -avz --delete \
     --exclude='.git' \
-    --exclude='__pycache__' \
+    --exclude='__pycache__/' \
     --exclude='*.pyc' \
     --exclude='.env' \
     --exclude='*.tar.gz' \

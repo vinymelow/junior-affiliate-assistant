@@ -8,8 +8,9 @@ except OSError:
     download("pt_core_news_sm")
     nlp = spacy.load("pt_core_news_sm")
 
-def get_intent_and_entities(text: str) -> dict:
+def get_intent_and_entities(text: str) -> tuple[str, dict]:
     intent = "geral"
+    entities = {}
     text_lower = text.lower()
 
     if any(keyword in text_lower for keyword in ["quero", "sim", "pode mandar", "manda o link", "aceito"]):
@@ -19,4 +20,4 @@ def get_intent_and_entities(text: str) -> dict:
     elif '?' in text:
         intent = "pergunta_geral"
     
-    return {"intent": intent, "entities": {}}
+    return intent, entities

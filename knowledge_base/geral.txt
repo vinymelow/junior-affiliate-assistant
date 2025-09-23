@@ -1,4 +1,4 @@
-# Ficheiro: knowledge_base/geral.txt
+# Respostas para perguntas frequentes
 tipo_documento: "info_geral"
 topicos:
   - nome: "seguranca"

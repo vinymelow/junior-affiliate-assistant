@@ -1,8 +1,13 @@
 # OFERTA PRINCIPAL DA BATEUBET (FUNIL CONVITE OURO)
 tipo_documento: "info_oferta"
 ofertas:
-  - nome: "Convite Ouro 500%"
-    casa_de_aposta: "BateuBet.br"
-    resposta_curta: "A boa é o nosso bônus de 500% no primeiro depósito com o Convite Ouro. Qualquer valor a partir de R$1 já ativa."
-    link_afiliado: "https://go.aff.bateu.bet.br/ipyehjvg?utm_source=pt001"
-    palavras_chave: ["bonus", "500%", "convite ouro", "promocao", "depositar", "link", "cadastrar", "ativar", "oferta", "como funciona"]
+  - nome: "convite ouro"
+    resposta_curta: "É um bônus exclusivo de 500% no seu primeiro depósito, mano. Qualquer valor a partir de R$1 já ativa."
+    palavras_chave:
+      - bonus
+      - 500%
+      - convite ouro
+      - promocao
+      - depositar
+      - oferta
+      - como funciona

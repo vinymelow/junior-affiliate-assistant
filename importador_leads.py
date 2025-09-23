@@ -2,41 +2,49 @@ import sqlite3
 import pandas as pd
 import os
 
-# --- CONFIGURAÇÕES ---
 DB_PATH = 'leads_master.db'
-CSV_PATH = 'data/leads_master.csv' # Coloque a sua lista principal de 100k leads aqui
+CSV_PATH = 'data/leads_master.csv'
 TABLE_NAME = 'leads'
 
 def criar_base_de_dados():
-    """
-    Cria a base de dados SQLite e a tabela de leads a partir de um ficheiro CSV.
-    Este script deve ser executado apenas uma vez para configurar a campanha.
-    """
     if os.path.exists(DB_PATH):
         print(f"AVISO: A base de dados '{DB_PATH}' já existe. Nenhuma ação foi tomada.")
         return
 
     print(f"INFO: A ler o ficheiro de leads de '{CSV_PATH}'...")
     try:
-        leads_df = pd.read_csv(CSV_PATH)
-        leads_df['telefone'] = leads_df['telefone'].astype(str)
+        colunas = [
+            'username', 'lead_id', 'registration_date', 'primeiro_nome', 'sobrenome', 
+            'email', 'coluna_vazia_1', 'genero', 'data_nascimento', 'rua', 
+            'complemento', 'estado', 'cidade', 'cep', 'telefone_1', 'telefone_2', 
+            'coluna_vazia_2', 'pais', 'cpf', 'coluna_vazia_3', 'ultima_atualizacao', 
+            'id_afiliado', 'outro_id', 'valor'
+        ]
+        
+        leads_df = pd.read_csv(CSV_PATH, delimiter=';', header=None, names=colunas, dtype={'telefone_1': str, 'lead_id': str})
+
+        leads_df['nome'] = leads_df['primeiro_nome'].str.cat(leads_df['sobrenome'], sep=' ').str.strip()
+        leads_df.rename(columns={'telefone_1': 'telefone'}, inplace=True)
+        
+        colunas_uteis = ['lead_id', 'nome', 'genero', 'cidade', 'telefone']
+        leads_final_df = leads_df[colunas_uteis].copy()
+        
+        leads_final_df['status'] = 'pendente'
+
     except FileNotFoundError:
         print(f"ERRO CRÍTICO: O ficheiro mestre de leads '{CSV_PATH}' não foi encontrado!")
         return
     except Exception as e:
-        print(f"ERRO CRÍTICO: Falha ao ler o ficheiro CSV. Erro: {e}")
+        print(f"ERRO CRÍTICO: Falha ao ler ou processar o ficheiro CSV. Erro: {e}")
         return
-
-    leads_df['status'] = 'pendente'
 
     print(f"INFO: A criar a base de dados em '{DB_PATH}'...")
     try:
         conn = sqlite3.connect(DB_PATH)
-        leads_df.to_sql(TABLE_NAME, conn, if_exists='replace', index=False)
+        leads_final_df.to_sql(TABLE_NAME, conn, if_exists='replace', index=False)
         conn.close()
         
-        print(f"✅ SUCESSO: Base de dados criada e {len(leads_df)} leads foram importados com o status 'pendente'.")
-        print("INFO: O sistema está pronto para a próxima fase.")
+        print(f"✅ SUCESSO: Base de dados criada e {len(leads_final_df)} leads foram importados com os campos de personalização.")
 
     except Exception as e:
         print(f"ERRO CRÍTICO: Falha ao criar ou popular a base de dados. Erro: {e}")

@@ -6,16 +6,11 @@ from app.services.affiliate import track_lead_status
 
 LEADS_FILE_PATH = 'data/leads.csv'
 
-# --- NOVO TEMPLATE DIA 1 (TORNEIO PRIMAVERA) ---
-MESSAGE_TEMPLATE = "Olá {nome_tratamento}, aqui é da Bateu Bet. Quer que eu ative sua inscrição no Torneio da Primavera com R$20.000 em prêmios? Responda SIM."
+MESSAGE_TEMPLATE = "{saudacao_genero}, aqui é da Bateu Bet 🌸. Quer que eu ative sua inscrição no Torneio da Primavera com R$20.000 em prêmios? Responda SIM."
 
 async def start_campaign():
-    """
-    Inicia a campanha com a mensagem de gatilho do Dia 1.
-    """
     try:
-        leads_df = pd.read_csv(LEADS_FILE_PATH)
-        leads_df['telefone'] = leads_df['telefone'].astype(str)
+        leads_df = pd.read_csv(LEADS_FILE_PATH, dtype={'telefone': str, 'lead_id': str})
     except FileNotFoundError:
         print(f"ERRO: Ficheiro de leads não encontrado em '{LEADS_FILE_PATH}'.")
         return
@@ -23,24 +18,28 @@ async def start_campaign():
     print(f"--- Iniciando campanha para {len(leads_df)} leads ---")
 
     for index, row in leads_df.iterrows():
-        lead_id = str(row['lead_id'])
-        nome = row['nome']
-        telefone = str(row['telefone'])
+        genero = row.get('genero', 'M')
+        nome_tratamento = row['nome'].split()[0]
         
-        nome_tratamento = nome.split()[0]
-        message = MESSAGE_TEMPLATE.format(nome_tratamento=nome_tratamento)
+        saudacao = f"Fala, {nome_tratamento}" if genero == 'M' else f"Olá, {nome_tratamento}"
+        
+        message = MESSAGE_TEMPLATE.format(saudacao_genero=saudacao)
 
-        print(f"\n--- Preparando para contactar {nome} ({telefone}) ---")
-
-        success = await send_whatsapp_message(telefone, message)
+        success = await send_whatsapp_message(row['telefone'], message)
         if success:
-            # Atualiza o tracker com o novo status e detalhes da oferta
             await track_lead_status(
-                lead_id=lead_id, nome=nome, telefone=telefone,
+                lead_id=str(row['lead_id']),
+                nome=row['nome'],
+                telefone=row['telefone'],
                 new_status='Funil_Dia1_ContatoInicial',
-                details={"casa_ofertada": "BateuBet.br", "oferta": "Torneio da Primavera R$20.000"}
+                details={
+                    "casa_ofertada": "BateuBet.br", 
+                    "oferta": "Torneio da Primavera R$20.000",
+                    "genero": genero,
+                    "cidade": row.get('cidade', 'N/A')
+                }
             )
-            print(f"Lead {nome} contactado. Status inicial 'Funil_Dia1_ContatoInicial' registado.")
+            print(f"Lead {row['nome']} contactado. Status e dados de personalização registados.")
         
         delay = random.uniform(15, 30)
         print(f"Aguardando {delay:.2f} segundos antes do próximo envio...")

@@ -1,0 +1,13 @@
+# CARTA NA MANGA: OFERTA DE CASHBACK (USAR COM CUIDADO)
+tipo_documento: "info_geral"
+topicos:
+  - nome: "cashback"
+    resposta_curta: "Relaxa, mano! Na BateuBet a gente te dá uma moral. Toda sexta rola um cashback pra te dar uma segunda chance."
+    palavras_chave:
+      - perdi
+      - nao ganhei
+      - azar
+      - cashback
+      - reembolso
+      - mais uma chance
+      - recuperar

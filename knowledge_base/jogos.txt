@@ -1,4 +1,4 @@
-# Ficheiro: knowledge_base/jogos.txt
+# Informações sobre jogos populares
 tipo_documento: "info_jogo"
 jogos:
   - nome: "Fortune Tiger"
@@ -8,7 +8,7 @@ jogos:
 
   - nome: "Gates of Olympus"
     apelidos: ["velho do raio", "olympus"]
-    resposta_curta: "Claro, esse é o jogo da nossa promo principal! Tá com 30 giros grátis nele."
+    resposta_curta: "Claro, esse é o jogo da nossa promo principal! Tá com giros grátis nele."
     palavras_chave: ["olympus", "gates", "velho do raio"]
     
   - nome: "Aviator"

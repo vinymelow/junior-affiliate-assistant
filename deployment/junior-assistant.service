@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 User=dev
-Group=www-data
+Group=dev
 WorkingDirectory=/home/dev/junior-affiliate-assistant
 ExecStart=/home/dev/junior-affiliate-assistant/venv/bin/uvicorn main:app --host 0.0.0.0 --port 8000
 Restart=always
