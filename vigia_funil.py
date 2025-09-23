@@ -3,33 +3,35 @@ import asyncio
 from datetime import datetime
 from app.services.whatsapp import send_whatsapp_message
 from app.services.affiliate import track_lead_status, parse_tracker_details
+from app.core.ai import generate_funnel_message # Importamos a nova função criativa
 
 TRACKER_FILE_PATH = 'data/conversation_tracker.csv'
 
+# MAPEAMENTO FINAL DO FUNIL COM OBJETIVOS PARA A IA (Extraído do vosso funil)
 FUNNEL_LOGIC = {
     'Funil_Dia1_ContatoInicial': {
         'dias_para_agir': 4,
-        'nova_mensagem': "Lembrete: o Torneio PG Soft com R$1,6M em prêmios já começou 🏆. Quer que eu garanta sua vaga agora?",
+        'objetivo_do_dia': "Dia 5 (Consultivo): Lembre o lead {nome} sobre o Torneio PG Soft com R$1,6M em prêmios que já começou e pergunte de forma consultiva se ele quer garantir a vaga.",
         'novo_status': 'Funil_Dia5_TorneioPG'
     },
     'Funil_Dia5_TorneioPG': {
         'dias_para_agir': 3,
-        'nova_mensagem': "⚡ Último dia do Torneio Diário com R$5.000 em prêmios. Posso ativar sua participação agora?",
+        'objetivo_do_dia': "Dia 8 (Urgência): Crie urgência para o lead {nome}, informando que é o último dia do Torneio Diário com R$5.000 em prêmios e pergunte se posso ativar a participação dele agora.",
         'novo_status': 'Funil_Dia8_TorneioDiario'
     },
     'Funil_Dia8_TorneioDiario': {
         'dias_para_agir': 5,
-        'nova_mensagem': "{nome}, você prefere começar com Cashback 🎲, Torneios 🏆 ou Giros extras 🔄? Posso indicar o melhor pra você.",
+        'objetivo_do_dia': "Dia 13 (Consultivo): De forma amigável, pergunte ao lead {nome} o que ele prefere para começar: Cashback, Torneios ou Giros extras, e diga que pode indicar a melhor opção para ele.",
         'novo_status': 'Funil_Dia13_PerguntaInteresse'
     },
     'Funil_Dia13_PerguntaInteresse': {
         'dias_para_agir': 3,
-        'nova_mensagem': "✈️ R$60.000 em prêmios no Torneio Aviator esse mês! Quer que eu ative sua inscrição agora? Responda SIM.",
+        'objetivo_do_dia': "Dia 16 (Gatilho): Crie entusiasmo no lead {nome} sobre os R$60.000 em prêmios no Torneio Aviator deste mês e termine com um gatilho de resposta clara (Responda SIM).",
         'novo_status': 'Funil_Dia16_TorneioAviator'
     },
     'Funil_Dia16_TorneioAviator': {
         'dias_para_agir': 4,
-        'nova_mensagem': "⚠️ Promoções Bateu Bet encerrando em horas. Depois não há volta! Quer ativar já e garantir sua chance?",
+        'objetivo_do_dia': "Dia 20 (Final): Use um tom de última chance para o lead {nome}. Informe que as promoções da Bateu Bet estão a encerrar em horas e que depois não há volta.",
         'novo_status': 'Funil_Dia20_UltimaChance'
     }
 }
@@ -48,33 +50,34 @@ async def run_funnel_watcher():
 
     for index, row in tracker_df.iterrows():
         status_atual = row['status']
-        last_update = datetime.strptime(row['last_update'], '%Y-%m-%d %H:%M:%S')
-        
         if status_atual in FUNNEL_LOGIC:
+            last_update = datetime.strptime(row['last_update'], '%Y-%m-%d %H:%M:%S')
             regra = FUNNEL_LOGIC[status_atual]
             dias_desde_update = (now - last_update).days
 
             if dias_desde_update >= regra['dias_para_agir']:
-                nome = row['nome']
-                telefone = row['telefone']
-                lead_id = row['lead_id']
+                nome, telefone, lead_id = row['nome'], row['telefone'], row['lead_id']
                 details = parse_tracker_details(row)
                 
                 nome_tratamento = nome.split()[0]
-                mensagem = regra['nova_mensagem'].format(nome=nome_tratamento)
+                objetivo_personalizado = regra['objetivo_do_dia'].format(nome=nome_tratamento)
                 
-                print(f"AVISO (Vigia): Lead '{nome}' atingiu a condição para '{regra['novo_status']}'. Enviando mensagem...")
+                print(f"AVISO (Vigia): A gerar mensagem para '{nome}' com o objetivo: {regra['novo_status']}...")
                 
-                success = await send_whatsapp_message(telefone, mensagem)
+                mensagem = await generate_funnel_message(objetivo_personalizado)
                 
-                if success:
-                    await track_lead_status(lead_id, nome, telefone, regra['novo_status'], details)
-                    leads_notificados += 1
+                if mensagem:
+                    success = await send_whatsapp_message(telefone, mensagem)
+                    if success:
+                        await track_lead_status(lead_id, nome, telefone, regra['novo_status'], details)
+                        leads_notificados += 1
+                else:
+                    print(f"ERRO (Vigia): A IA não conseguiu gerar a mensagem para o objetivo: {regra['novo_status']}")
             
     if leads_notificados > 0:
-        print(f"--- VIGIA: {leads_notificados} leads avançaram no funil de WhatsApp. ---")
+        print(f"--- VIGIA: {leads_notificados} leads avançaram no funil com mensagens geradas por IA. ---")
     else:
-        print("--- VIGIA: Nenhum lead precisou de ação de WhatsApp neste ciclo. ---")
+        print("--- VIGIA: Nenhum lead precisou de ação neste ciclo. ---")
 
 if __name__ == "__main__":
     asyncio.run(run_funnel_watcher())
