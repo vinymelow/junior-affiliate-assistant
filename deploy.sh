@@ -10,6 +10,7 @@ echo "🚀 Iniciando deploy 'Hard Reset' para o Júnior Affiliate Assistant..."
 
 # --- PASSO 1: ENVIAR FICHEIROS ATUALIZADOS ---
 echo "📤 A enviar a versão mais recente do código para o servidor..."
+# Nota: Esta versão do rsync garante que a pasta 'deployment' seja copiada.
 rsync -avz --delete \
     --exclude='.git' \
     --exclude='__pycache__/' \
@@ -17,7 +18,6 @@ rsync -avz --delete \
     --exclude='.env' \
     --exclude='*.tar.gz' \
     --exclude='data/' \
-    --exclude='knowledge_base/' \
     --exclude='*.db' \
     ./ "$SERVER:$REMOTE_DIR/"
 
@@ -30,7 +30,7 @@ ssh "$SERVER" << EOF
     echo "--- PASSO 1: PARAR E DESATIVAR O SERVIÇO ANTIGO (SE EXISTIR) ---"
     sudo systemctl stop "$SERVICE_NAME.service" 2>/dev/null || echo "INFO: Serviço não estava a correr."
     sudo systemctl disable "$SERVICE_NAME.service" 2>/dev/null || echo "INFO: Serviço não estava ativo."
-    sudo rm -f "/etc/systemd/system/$SERVICE_NAME.service" # Remove a versão antiga para garantir uma instalação limpa
+    sudo rm -f "/etc/systemd/system/$SERVICE_NAME.service"
     sudo systemctl daemon-reload
 
     echo "--- PASSO 2: COPIAR O NOVO FICHEIRO DE SERVIÇO ---"

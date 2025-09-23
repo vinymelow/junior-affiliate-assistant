@@ -42,8 +42,13 @@ class SimpleRAG:
         
         return {"answer": best_match}
 
+# --- Instância única do RAG ---
 rag_system = SimpleRAG()
 
+# --- Funções de Fachada que a IA pode chamar ---
 async def find_answer_in_kb(query: str) -> dict:
+    """
+    Função de fachada para a ferramenta de Q&A. Retorna um dicionário.
+    """
     print(f"--- TOOL CALL: find_answer_in_kb(query='{query}') ---")
     return rag_system.find_answer_in_kb(query)

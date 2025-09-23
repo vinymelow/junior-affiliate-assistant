@@ -7,6 +7,8 @@ import openai
 from app.config import settings
 import asyncio
 
+# --- CORREÇÃO CRÍTICA: LOCK PARA PROTEGER O ACESSO AOS FICHEIROS ---
+# Este lock garante que apenas uma tarefa pode ler/escrever nos CSVs de cada vez.
 file_lock = asyncio.Lock()
 
 LEADS_FILE_PATH = 'data/leads.csv'
@@ -26,14 +28,12 @@ async def get_lead_details(phone_number: str) -> str:
             lead_info = leads_df[leads_df['telefone'] == phone_number]
             if not lead_info.empty:
                 return json.dumps({
-                    "nome": lead_info.iloc[0]['nome'], 
-                    "genero": lead_info.iloc[0]['genero'],
-                    "cidade": lead_info.iloc[0]['cidade'],
+                    "nome": lead_info.iloc[0]['nome'], "genero": lead_info.iloc[0]['genero'].upper(),
                     "lead_id": str(lead_info.iloc[0]['lead_id'])
                 })
-            return json.dumps({"nome": "parceiro(a)", "genero": "N", "cidade": "N/A", "lead_id": "unknown"})
+            return json.dumps({"nome": "parceiro(a)", "genero": "N", "lead_id": "unknown"})
         except FileNotFoundError:
-            return json.dumps({"nome": "parceiro(a)", "genero": "N", "cidade": "N/A", "lead_id": "unknown_file_not_found"})
+            return json.dumps({"nome": "parceiro(a)", "genero": "N", "lead_id": "unknown_file_not_found"})
         except Exception as e:
             return json.dumps({"error": f"Erro ao ler leads: {e}"})
 
@@ -47,7 +47,7 @@ async def get_lead_current_status(phone_number: str) -> dict:
                 details_dict = parse_tracker_details(last_entry)
                 return {"status": last_entry['status'], "details": details_dict, "summary": last_entry.get('summary', '')}
         except FileNotFoundError:
-            pass
+            pass # Retorna o default abaixo se o ficheiro não existir
         except Exception as e:
             print(f"AVISO: Não foi possível ler o tracker para {phone_number}. Erro: {e}")
         return {"status": "Fase1_ContatoInicial", "details": {}, "summary": ""}
@@ -81,7 +81,7 @@ async def track_lead_status(lead_id: str, nome: str, telefone: str, new_status: 
 
 async def summarize_and_save_conversation(phone_number: str, conversation_history: list) -> str:
     try:
-        transcript = "\n".join([f"{msg.get('role')}: {msg.get('content')}" for msg in conversation_history if msg.get('content')])
+        transcript = "\n".join([f"{msg['role']}: {msg['content']}" for msg in conversation_history if 'content' in msg and msg['content'] is not None])
         
         client = openai.AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
         response = await client.chat.completions.create(
