@@ -1,5 +1,4 @@
 # Ficheiro: knowledge_base/jogos.txt
-
 tipo_documento: "info_jogo"
 jogos:
   - nome: "Fortune Tiger"

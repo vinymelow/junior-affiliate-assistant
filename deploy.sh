@@ -1,53 +1,73 @@
 #!/bin/bash
 
-# Script de Deploy para o Servidor SSH
-# Servidor: dev@31.97.42.102
-
-echo "🚀 Iniciando deploy do Júnior Affiliate Assistant..."
-
-# Configurações do servidor
+# --- CONFIGURAÇÕES ---
 SERVER="dev@31.97.42.102"
 REMOTE_DIR="/home/dev/junior-affiliate-assistant"
 SERVICE_NAME="junior-assistant"
+SERVICE_FILE="deployment/junior_assistant.service"
 
-echo "📦 Fazendo backup do projeto atual..."
-tar -czf backup-$(date +%Y%m%d-%H%M%S).tar.gz --exclude='.git' --exclude='__pycache__' --exclude='*.pyc' .
+echo "🚀 Iniciando deploy 'Hard Reset' para o Júnior Affiliate Assistant..."
 
-echo "📤 Enviando arquivos para o servidor..."
+# --- PASSO 1: ENVIAR FICHEIROS ATUALIZADOS ---
+echo "📤 A enviar a versão mais recente do código para o servidor..."
 rsync -avz --delete \
     --exclude='.git' \
     --exclude='__pycache__' \
     --exclude='*.pyc' \
     --exclude='.env' \
-    --exclude='backup-*.tar.gz' \
-    ./ $SERVER:$REMOTE_DIR/
+    --exclude='*.tar.gz' \
+    --exclude='data/' \
+    --exclude='knowledge_base/' \
+    --exclude='*.db' \
+    ./ "$SERVER:$REMOTE_DIR/"
 
-echo "🔧 Configurando ambiente no servidor..."
-ssh $SERVER << 'EOF'
-cd /home/dev/junior-affiliate-assistant
+# --- PASSO 2: EXECUTAR CONFIGURAÇÃO REMOTA VIA SSH ---
+echo "🔧 A configurar o ambiente e a reiniciar o serviço no servidor..."
+ssh "$SERVER" << EOF
+    # Navega para o diretório do projeto
+    cd "$REMOTE_DIR"
 
-echo "📋 Atualizando dependências..."
-if [ ! -d "venv" ]; then
+    echo "--- PASSO 1: PARAR E DESATIVAR O SERVIÇO ANTIGO (SE EXISTIR) ---"
+    sudo systemctl stop "$SERVICE_NAME.service" 2>/dev/null || echo "INFO: Serviço não estava a correr."
+    sudo systemctl disable "$SERVICE_NAME.service" 2>/dev/null || echo "INFO: Serviço não estava ativo."
+    sudo rm -f "/etc/systemd/system/$SERVICE_NAME.service" # Remove a versão antiga para garantir uma instalação limpa
+    sudo systemctl daemon-reload
+
+    echo "--- PASSO 2: COPIAR O NOVO FICHEIRO DE SERVIÇO ---"
+    if [ -f "$SERVICE_FILE" ]; then
+        echo "✅ Ficheiro de serviço encontrado. A copiá-lo para o sistema..."
+        sudo cp "$SERVICE_FILE" "/etc/systemd/system/$SERVICE_NAME.service"
+    else
+        echo "❌ ERRO CRÍTICO: Ficheiro de serviço '$SERVICE_FILE' não encontrado no servidor!"
+        exit 1
+    fi
+
+    echo "--- PASSO 3: REINSTALAR AMBIENTE VIRTUAL E DEPENDÊNCIAS ---"
+    rm -rf venv
     python3 -m venv venv
-fi
+    source venv/bin/activate
+    pip install --upgrade pip
+    pip install -r requirements.txt
+    deactivate
+    echo "✅ Ambiente virtual recriado e dependências instaladas."
 
-source venv/bin/activate
-pip install --upgrade pip
-pip install -r requirements.txt
+    echo "--- PASSO 4: REINICIAR O GESTOR DE SERVIÇOS ---"
+    sudo systemctl daemon-reload
+    echo "✅ Gestor de serviços atualizado."
 
-echo "🔄 Reiniciando serviço..."
-sudo systemctl stop junior-assistant
-sudo systemctl daemon-reload
-sudo systemctl start junior-assistant
-sudo systemctl enable junior-assistant
-
-echo "📊 Status do serviço:"
-sudo systemctl status junior-assistant --no-pager
-
-echo "📝 Logs recentes:"
-sudo journalctl -u junior-assistant --no-pager -n 20
+    echo "--- PASSO 5: INICIAR E VERIFICAR O NOVO SERVIÇO ---"
+    sudo systemctl enable "$SERVICE_NAME.service"
+    sudo systemctl start "$SERVICE_NAME.service"
+    
+    echo "⏳ A aguardar 5 segundos para o serviço estabilizar..."
+    sleep 5
+    
+    echo "📊 Status final do serviço:"
+    sudo systemctl status "$SERVICE_NAME.service" --no-pager
+    
+    echo "📝 A verificar os logs de arranque para confirmar a nova versão:"
+    sudo journalctl -u "$SERVICE_NAME.service" -n 15 --no-pager
 EOF
 
-echo "✅ Deploy concluído!"
-echo "🌐 A API deve estar rodando em: http://31.97.42.102:8000"
-echo "📱 Webhook do WhatsApp: http://31.97.42.102:8000/whatsapp/webhook"
+echo "✅ Deploy 'Hard Reset' concluído!"
+echo "O assistente está agora a executar a versão mais recente. Por favor, teste novamente."

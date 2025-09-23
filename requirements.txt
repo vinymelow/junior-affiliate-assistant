@@ -9,3 +9,4 @@ pydantic
 pydantic-settings
 pandas
 PyYAML
+google-generativeai

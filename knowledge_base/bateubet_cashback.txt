@@ -1,15 +1,7 @@
 # CARTA NA MANGA: OFERTA DE CASHBACK (USAR COM CUIDADO)
-casa_de_aposta: "BateuBet.br"
-descricao_curta: "um benefício exclusivo de cashback de até 200 giros grátis toda sexta-feira pra te dar uma segunda chance."
-deposito_minimo: "N/A (Benefício para depositantes)"
-link_afiliado: "https://SEU-LINK-AFILIATTE-BR.com/bateubet"
-interesses_chave:
-  - perdi
-  - nao ganhei
-  - azar
-  - cashback
-  - reembolso
-palavras_chave_secundarias:
-  - mais uma chance
-  - recuperar
-  - sexta-feira
+tipo_documento: "info_oferta"
+ofertas:
+  - nome: "Cashback Sexta-Feira"
+    casa_de_aposta: "BateuBet.br"
+    resposta_curta: "Se a sorte não virar, toda sexta tem cashback de até 200 giros grátis pra te dar uma segunda chance."
+    palavras_chave: ["perdi", "nao ganhei", "cashback", "reembolso", "mais uma chance", "recuperar", "sexta-feira"]
