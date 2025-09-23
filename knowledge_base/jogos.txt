@@ -1,0 +1,18 @@
+# Ficheiro: knowledge_base/jogos.txt
+
+tipo_documento: "info_jogo"
+jogos:
+  - nome: "Fortune Tiger"
+    apelidos: ["tigrinho", "jogo do tigre"]
+    resposta_curta: "Temos o Fortune Tiger (o famoso Tigrinho) sim, parça! É um dos mais procurados."
+    palavras_chave: ["tigre", "tigrinho", "fortune tiger"]
+
+  - nome: "Gates of Olympus"
+    apelidos: ["velho do raio", "olympus"]
+    resposta_curta: "Claro, esse é o jogo da nossa promo principal! Tá com 30 giros grátis nele."
+    palavras_chave: ["olympus", "gates", "velho do raio"]
+    
+  - nome: "Aviator"
+    apelidos: ["aviao", "aviaoziho"]
+    resposta_curta: "Temos o Aviator também, mano. Inclusive tá rolando um torneio de R$60.000 nele!"
+    palavras_chave: ["aviator", "aviao", "aviaoziho"]

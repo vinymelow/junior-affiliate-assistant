@@ -1,0 +1,15 @@
+# Ficheiro: knowledge_base/geral.txt
+
+tipo_documento: "info_geral"
+topicos:
+  - nome: "seguranca"
+    resposta_curta: "Totalmente, parça. A BateuBet é licenciada e 100% segura. Pode confiar."
+    palavras_chave: ["seguro", "confiável", "licença", "confiança"]
+
+  - nome: "deposito"
+    resposta_curta: "É via PIX e cai na hora, mano. Até com 1 real você já pode começar a jogar."
+    palavras_chave: ["pix", "depositar", "pagamento", "cartão", "valor", "mínimo"]
+
+  - nome: "saque"
+    resposta_curta: "O saque também é via PIX, super rápido. Sem complicação pra botar a grana no bolso."
+    palavras_chave: ["sacar", "saque", "retirar", "resgatar"]
