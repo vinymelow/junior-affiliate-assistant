@@ -5,6 +5,7 @@ from app.config import settings
 from app.services.whatsapp import send_whatsapp_message
 from app.services.affiliate import track_lead_status, summarize_and_save_conversation
 from app.core.rag import find_answer_in_kb
+from app.core.gender_detector import detect_gender_from_name, get_appropriate_greeting
 
 ASSISTANT_INSTRUCTIONS = """
 # PILAR 1: IDENTIDADE E MISSÃO CRÍTICA
@@ -66,12 +67,14 @@ Sua identidade como consultor de entretenimento exige responsabilidade.
 - Esta abordagem constrói confiança a longo prazo e estabelece autoridade.
 
 # PILAR 6: REGRAS GERAIS DE LINGUAGEM E FORMATO
-- Linguagem: "Papo reto", use gírias como 'mano', 'parça', 'demorou', 'fechou', 'é a boa'. Adapte para 'mana' ou 'amiga' se o gênero for 'F'.
-- Uso de "parça": Use com moderação! Apenas no início da conversa para criar rapport e na mensagem final com o link. Evite repetir em todas as mensagens.
+- Linguagem: "Papo reto", use gírias como 'mano', 'parça', 'demorou', 'fechou', 'é a boa'. 
+- Detecção de Gênero: SEMPRE analise o nome do lead para identificar se é masculino ou feminino. Use 'mano', 'parça', 'cara' para homens e 'mana', 'amiga', 'garota' para mulheres. NUNCA use 'parceiro(a)' ou formas genéricas.
+- Uso de "parça": Use APENAS no início da conversa para criar rapport e na mensagem final quando enviar o link. Evite repetir em todas as mensagens.
 - Tamanho: Respostas curtas, idealmente abaixo de 90 caracteres para manter a agilidade da conversa no WhatsApp.
-- Links: NUNCA use colchetes [], parênteses () ou formatação especial com links. Envie de forma totalmente natural e humanizada. 
+- Links: JAMAIS use colchetes [], parênteses () ou formatação markdown com links. Envie de forma totalmente natural e humanizada. 
   Exemplo CORRETO: "Claro, parça! Aqui tá o link: https://go.aff.bateu.bet.br/ipyehjvg?utm_source=pt001 Bora lucrar! 🚀"
-  Exemplo ERRADO: "Aqui tá o link: [Acessa agora](https://go.aff.bateu.bet.br/ipyehjvg?utm_source=pt001)"
+  Exemplo ERRADO: "Confere aí, parça! [Link](https://go.aff.bateu.bet.br/ipyehjvg?utm_source=pt001). Alguma dúvida?"
+- Envio Automático de Link: Quando o usuário demonstrar interesse com frases como "vamos nessa", "bora", "quero sim", "fechou", "vamos lá", SEMPRE envie o link automaticamente sem esperar ele pedir.
 
 # CONTEXTO DO LEAD ATUAL (JSON)
 {lead_context}
@@ -79,6 +82,20 @@ Sua identidade como consultor de entretenimento exige responsabilidade.
 
 async def get_ai_response(phone_number: str, user_message: str, system_prompt: str, lead_context: dict):
     print("--- Cérebro da IA (Consultor de Vendas) ativado ---")
+    
+    # 🎯 MELHORIA: Detecção automática de gênero se não estiver definido
+    nome_lead = lead_context.get('nome', 'parça')
+    genero_atual = lead_context.get('genero', 'N')
+    
+    # Se gênero não está definido ou é neutro, tenta detectar pelo nome
+    if genero_atual == 'N' and nome_lead != 'parça':
+        genero_detectado = detect_gender_from_name(nome_lead)
+        if genero_detectado != 'N':
+            print(f"🔍 Gênero detectado automaticamente para '{nome_lead}': {genero_detectado}")
+            lead_context['genero'] = genero_detectado
+            # Atualiza o system_prompt com o gênero correto
+            system_prompt = ASSISTANT_INSTRUCTIONS.format(lead_context=json.dumps(lead_context, indent=2))
+    
     tools = [
         {"type": "function", "function": {"name": "find_answer_in_kb", "description": "Busca na base de conhecimento uma resposta para perguntas sobre a BateuBet (segurança, depósitos, jogos, etc.).", "parameters": {"type": "object", "properties": {"query": {"type": "string"}}, "required": ["query"]}}},
         {"type": "function", "function": {"name": "track_lead_status", "description": "Atualiza o status do lead no funil para 'Funil_CONVERTIDO' ou 'Funil_RECUSADO'. Use isso quando o lead confirmar que já depositou ou pedir para parar de receber mensagens.", "parameters": {"type": "object", "properties": {"new_status": {"type": "string", "enum": ["Funil_CONVERTIDO", "Funil_RECUSADO"]}, "details": {"type": "object"}}, "required": ["new_status", "details"]}}}
