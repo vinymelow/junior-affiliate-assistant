@@ -86,7 +86,7 @@ async def get_ai_response(phone_number: str, user_message: str, system_prompt: s
     messages = [{"role": "system", "content": system_prompt}, {"role": "user", "content": user_message}]
     try:
         client = openai.AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
-        response = await client.chat.completions.create(model="gpt-4o", messages=messages, tools=tools, tool_choice="auto")
+        response = await client.chat.completions.create(model="gpt-4o-mini", messages=messages, tools=tools, tool_choice="auto")
         response_message = response.choices[0].message
         tool_calls = response_message.tool_calls
         if tool_calls:
@@ -106,7 +106,7 @@ async def get_ai_response(phone_number: str, user_message: str, system_prompt: s
                         function_args['details'] = {}
                 function_response = await function_to_call(**function_args)
                 messages.append({"tool_call_id": tool_call.id, "role": "tool", "name": function_name, "content": json.dumps(function_response)})
-            second_response = await client.chat.completions.create(model="gpt-4o", messages=messages)
+            second_response = await client.chat.completions.create(model="gpt-4o-mini", messages=messages)
             final_response = second_response.choices[0].message.content
         else:
             final_response = response_message.content
@@ -151,7 +151,7 @@ async def generate_funnel_message(objective: str, lead_name: str = "parça") -> 
     try:
         client = openai.AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
         response = await client.chat.completions.create(
-            model="gpt-4o",
+            model="gpt-4o-mini",
             messages=messages,
             temperature=0.8 # Aumenta a criatividade
         )

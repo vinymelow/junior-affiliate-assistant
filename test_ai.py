@@ -47,7 +47,7 @@ async def test_ai_response():
         ]
         
         response = await client.chat.completions.create(
-            model="gpt-4o",
+            model="gpt-4o-mini",
             messages=messages
         )
         
